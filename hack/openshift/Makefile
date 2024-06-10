@@ -7,6 +7,8 @@ operators:
 	../wait.sh subscription openshift-logging cluster-logging
 	../wait.sh subscription openshift-operators-redhat loki-operator
 	../wait.sh subscription openshift-netobserv-operator netobserv-operator
+	../wait.sh subscription openshift-opentelemetry-operator opentelemetry-operator
+	../wait.sh subscription openshift-tempo-operator tempo-operator
 	kubectl patch consoles.operator.openshift.io/cluster --type=merge --patch '{ "spec": { "plugins": ["monitoring-plugin", "logging-view-plugin", "netobserv-plugin"]}}'
 
 # Find default storage class.
@@ -30,6 +32,15 @@ deployment.apps/logging-loki-querier \
 deployment.apps/logging-loki-query-frontend \
 deployment.apps/logging-view-plugin
 
+OPENTELEMETRY_ROLLOUT=../wait.sh rollout openshift-opentelemetry-operator \
+deployment.apps/opentelemetry-operator-controller-manager
+
+TEMPO_ROLLOUT=../wait.sh rollout openshift-tempo-operator \
+deployment.apps/tempo-operator-controller \
+deployment.apps/tempo-simplest-query-frontend \
+deployment.apps/tempo-simplest-distributor \
+deployment.apps/tempo-simplest-querier \
+deployment.apps/tempo-simplest-compactor
 
 NETOBSERV_ROLLOUT=../wait.sh rollout netobserv \
 deployment.apps/loki-distributor \
@@ -42,6 +53,8 @@ resources: $(STORAGE_ENV)
 	kubectl apply -k config/resources
 	$(MINIO_ROLLOUT)
 	$(LOGGING_ROLLOUT)
+	$(OPENTELEMETRY_ROLLOUT)
+	$(TEMPO_ROLLOUT)
 	$(NETOBSERV_ROLLOUT)
 
 clean-operators:
