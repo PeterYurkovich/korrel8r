@@ -5,3 +5,5 @@ resources:
   - lokistack.yaml
   - logging.yaml
   - netobserv.yaml
+  - otel.yaml
+  - tempostack.yaml

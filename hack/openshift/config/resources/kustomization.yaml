@@ -6,6 +6,7 @@ resources:
   - chat.yaml
   - logging
   - netobserv
+  - tempo
 
 configMapGenerator:
   - name: storage-env
